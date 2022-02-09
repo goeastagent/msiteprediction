@@ -1,0 +1,69 @@
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import StratifiedShuffleSplit, StratifiedKFold, ShuffleSplit
+from sklearn import metrics
+
+import multiprocessing
+
+import pickle
+
+import dataloader
+import method
+import ResultManager
+import config
+
+n_iter = 1
+
+def crossvalidation(X,y):
+    #rm = ResultManager.ResultManager()
+    models = []
+    for i in range(n_iter):
+        skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=i)
+        for train_index, test_index in skf.split(X,y):
+            train_x, train_y = X[train_index], y[train_index]
+            test_x, test_y = X[test_index], y[test_index]
+            model = single_run(train_x, train_y, test_x, test_y)
+            models.append(model)
+            #rm.append_result(auroc, auprc, test_x, test_y, model)
+    return models
+
+def single_run(train_x, train_y, test_x, test_y):
+    batch_size = 64
+    epochs = 20
+    inp_dim = train_x.shape[1]
+    # model = method.MLModels(inp_dim, batch_size, epochs)
+    # model.fit(train_x, train_y)
+    # model.evaluate(test_x, test_y)
+    print(model)
+    return model
+
+def main():
+    # df, features, Y = dataloader.load_multi_lungpancreasliver_primarymetastasis()
+    # df = pd.concat([df,Y],axis=1)
+    # df.to_csv('input/baseline_experiment.csv',sep=',',index=False)
+
+    df = pd.read_csv('input/baseline_experiment.csv',sep=',')
+    features = dataloader.load_feature_names()
+    #df = df[df['Cohort'] == 'FAMDpr']
+
+    # with multiprocessing.Pool(8) as p:
+    #     pass
+    
+    X = df[features].values
+    Y = df[config.outcome_colnames_1]
+    
+    result = {}
+    
+    for label in Y.columns:
+        print("{} classification".format(label))
+        y = Y[label].values
+        result[label] = crossvalidation(X,y)
+
+    with open(config.baseline_result_out_filename, 'wb') as outp:
+        pickle.dump(result, outp)
+
+if __name__ == '__main__':
+    main()
+    
+    
