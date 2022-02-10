@@ -75,15 +75,16 @@ class MLModels(object):
         for model_name in self.model_names:
             print("{} fitting...".format(model_name))
             self.fit_(model_name, x_train, y_train)
-
+        
+            
     def fit_(self, model_name, X, y):
         model = self.models[model_name]
 
         if model_name == 'logit':
-            scores = cross_val_score(model, X, y, scoring='balanced_accuracy', cv=StratifiedKFold(n_splits=5), n_jobs=10)
+            scores = cross_val_score(model, X, y, scoring='balanced_accuracy', cv=StratifiedKFold(n_splits=5))
             self.val[model_name] = scores
         elif model_name in ['lasso','ridge']:
-            clf = GridSearchCV(model, config.parameters[model_name], cv=StratifiedKFold(n_splits=5), verbose=1, n_jobs=10, scoring='balanced_accuracy')
+            clf = GridSearchCV(model, config.parameters[model_name], cv=StratifiedKFold(n_splits=5), verbose=1, scoring='balanced_accuracy')
             clf.fit(X,y)
             self.val[model_name] = clf
         # elif model_name == 'rf':
