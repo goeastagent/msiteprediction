@@ -3,6 +3,7 @@ import seaborn as sns
 
 import numpy as np
 import pandas as pd
+import os
 
 from sklearn.decomposition import PCA
 
@@ -36,9 +37,7 @@ def plot_explained_ratio(cohort_list):
 
 def load_result():
     with open(config.baseline_result_out_filename, 'rb') as inp:
-        result=pickle.load(inp)
-
-        
+        result=pickle.load(inp)        
     
 if __name__ == '__main__':
     check_availability()
