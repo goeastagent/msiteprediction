@@ -18,7 +18,7 @@ def run(X,y):
     epochs = 20
     inp_dim = X.shape[1]
     model = method.MLModels(inp_dim, batch_size, epochs)
-    model.fit(X, y)
+    model.fit(X, y, default=True)
     return model
 
 def main():
@@ -40,7 +40,7 @@ def main():
         if len(np.unique(y)) == 1:
             continue
         result[label] = run(X,y)
-
+        
     with open(config.baseline_result_out_filename, 'wb') as outp:
         pickle.dump(result, outp)
 

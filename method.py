@@ -59,10 +59,10 @@ class MLModels(object):
         models['logit'] = LogisticRegression()
         models['lasso'] = LogisticRegression(penalty='l1', C=1, solver='liblinear')
         models['ridge'] = LogisticRegression(penalty='l2', C=1)
-        models['rf'] = RandomForestClassifier()
+        #models['rf'] = RandomForestClassifier()
         #models['gb'] = GradientBoostingClassifier()
-        models['svm'] = svm.SVC()
-        models['dense'] = DefaultModel(inp_dim)
+        #models['svm'] = svm.SVC()
+        #models['dense'] = DefaultModel(inp_dim)
         
         self.models=models
         self.val = {}
@@ -71,22 +71,24 @@ class MLModels(object):
         self.batch_size = batch_size
         self.epochs = epochs
 
-    def fit(self, x_train, y_train):
+    def fit(self, x_train, y_train, default):
         for model_name in self.model_names:
             print("{} fitting...".format(model_name))
-            self.fit_(model_name, x_train, y_train)
+            self.fit_(model_name, x_train, y_train, default)
         
             
-    def fit_(self, model_name, X, y):
+    def fit_(self, model_name, X, y, default):
         model = self.models[model_name]
-
-        if model_name == 'logit':
-            scores = cross_val_score(model, X, y, scoring='balanced_accuracy', cv=StratifiedKFold(n_splits=5))
-            self.val[model_name] = scores
-        elif model_name in ['lasso','ridge']:
+        if default:
+            clf = GridSearchCV(model, config.default_parameters[model_name], cv=StratifiedKFold(n_splits=5), verbose=1, scoring='balanced_accuracy')
+            clf.fit(X,y)
+            #scores = cross_val_score(model, X, y, scoring='balanced_accuracy', cv=StratifiedKFold(n_splits=5))
+            self.val[model_name]=clf
+        else:
             clf = GridSearchCV(model, config.parameters[model_name], cv=StratifiedKFold(n_splits=5), verbose=1, scoring='balanced_accuracy')
             clf.fit(X,y)
-            self.val[model_name] = clf
+            self.val[model_name]=clf
+            
         # elif model_name == 'rf':
         #     pass
         # elif model_name == 'gb':

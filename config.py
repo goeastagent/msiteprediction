@@ -9,8 +9,14 @@ outcome_colnames_1 = ['P:Lung, NOS', 'P:Pancreas, NOS', 'P:Lung', 'P:Pancreas', 
 baseline_result_out_filename = 'baseline_result.pkl'
 image_out_dir = 'image/'
 
-parameters= {'lasso': {'C': np.arange(0.01, 10, 0.1)},
+parameters= {'logit': {'solver': ['lbfgs', 'sag', 'saga','newton-cg']},
+             'lasso': {'C': np.arange(0.01, 10, 0.1)},
              'ridge': {'C': np.arange(0.01, 10, 0.1)},
              'svm': {'kernel': ['poly','rbf','sigmoid','linear'], 'gamma':'auto'}}
 
+default_parameters = {'logit': {'solver': ['lbfgs']},
+                      'lasso': {'C': [1.]},
+                      'ridge': {'C': [1.]},
+                      'svm': {'kernel': ['linear'], 'gamma':'auto'}}
 
+                      
